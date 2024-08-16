@@ -3,34 +3,6 @@
   "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "init-container",
-      "image": "alpine:latest",
-      "cpu": 64,
-      "memory": 128,
-      "memoryReservation": 64,
-      "essential": false,
-      "command": [
-        "wget",
-        "-O",
-        "/tmp/prometheus.yml",
-        "https://raw.githubusercontent.com/JustAzul/ecs-monitoring-with-prometheus-grafana/master/prometheus.yml"
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "temp_volume",
-          "containerPath": "/tmp"
-        }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/prometheus-grafana",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs"
-        }
-      }
-    },
-    {
       "name": "prometheus",
       "image": "prom/prometheus:v2.37.9",
       "user": "655:655",
@@ -45,8 +17,8 @@
         }
       ],
       "command": [
-        "--config.file=/tmp/prometheus.yml",
-        "--storage.tsdb.path=/mnt/efs/data",
+        "--config.file=/.prometheus-config/prometheus.yml",
+        "--storage.tsdb.path=/.prometheus-data",
         "--web.console.libraries=/.prometheus-config/console_libraries",
         "--web.console.templates=/.prometheus-config/consoles",
         "--storage.tsdb.retention.time=200h",
@@ -54,13 +26,10 @@
       ],
       "mountPoints": [
         {
-          "sourceVolume": "temp_volume",
-          "containerPath": "/tmp"
+          "sourceVolume": "prometheus_data",
+          "containerPath": "/.prometheus-data"
         },
         {
-          "sourceVolume": "prometheus_data",
-          "containerPath": "/prometheus"
-        },{
           "sourceVolume": "prometheus_config",
           "containerPath": "/.prometheus-config"
         }
@@ -69,22 +38,16 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/prometheus-grafana",
+          "awslogs-group": "/ecs/prometheus",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
         }
-      },
-      "dependsOn": [
-        {
-          "containerName": "init-container",
-          "condition": "COMPLETE"
-        }
-      ]
+      }
     },
     {
       "name": "grafana",
       "image": "grafana/grafana-oss:latest",
-      "user": "655:655",
+      "user": "656:656",
       "cpu": 256,
       "memory": 256,
       "memoryReservation": 128,
@@ -101,20 +64,15 @@
           "containerPath": "/var/lib/grafana"
         },
         {
-          "sourceVolume": "grafana_provisioning",
-          "containerPath": "/etc/grafana/provisioning"
-        },
-        {
-          "sourceVolume": "grafana_ini",
-          "containerPath": "/etc/grafana/grafana.ini",
-          "readOnly": true
+          "sourceVolume": "grafana_config",
+          "containerPath": "/etc/grafana"
         }
       ],
       "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/prometheus-grafana",
+          "awslogs-group": "/ecs/grafana",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
         }
@@ -123,46 +81,51 @@
   ],
   "volumes": [
     {
-      "name": "temp_volume",
-      "host": {}
-    },
-    {
       "name": "prometheus_data",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "rootDirectory": "/data"      }
+        "authorizationConfig": {
+          "accessPointId": "fsap-05ccf1a675b937bb2",
+          "iam": "ENABLED"
+        }
+      }
     },
     {
       "name": "prometheus_config",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "rootDirectory": "/config"      }
+        "authorizationConfig": {
+          "accessPointId": "fsap-08fd12728c2dfc58b",
+          "iam": "ENABLED"
+        }
+      }
     },
     {
       "name": "grafana_data",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "rootDirectory": "/grafana"      }
+        "authorizationConfig": {
+          "accessPointId": "fsap-0944fc9e03a4b8e53",
+          "iam": "ENABLED"
+        }
+      }
     },
     {
-      "name": "grafana_provisioning",
+      "name": "grafana_config",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "rootDirectory": "/grafana/provisioning"      }
-    },
-    {
-      "name": "grafana_ini",
-      "efsVolumeConfiguration": {
-        "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "rootDirectory": "/grafana/config/grafana.ini"      }
+        "authorizationConfig": {
+          "accessPointId": "fsap-00bd5e71fa95244ca",
+          "iam": "ENABLED"
+        }
+      }
     }
   ],
   "requiresCompatibilities": ["EC2"],
-  "cpu": "832",
-  "memory": "512"
+  "cpu": "768",
+  "memory": "768"
 }
