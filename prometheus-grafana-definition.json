@@ -11,14 +11,14 @@
       "essential": false,
       "command": [
         "wget",
-        "https://raw.githubusercontent.com/JustAzul/ecs-monitoring-with-prometheus-grafana/master/prometheus.yml",
-        "-P",
-        "/mnt"
+        "-O",
+        "/tmp/prometheus.yml",
+        "https://raw.githubusercontent.com/JustAzul/ecs-monitoring-with-prometheus-grafana/master/prometheus.yml"
       ],
       "mountPoints": [
         {
-          "sourceVolume": "prometheus_config",
-          "containerPath": "/mnt"
+          "sourceVolume": "temp_volume",
+          "containerPath": "/tmp"
         }
       ],
       "logConfiguration": {
@@ -32,7 +32,8 @@
     },
     {
       "name": "prometheus",
-      "image": "prom/prometheus:v2.4.0",
+      "image": "prom/prometheus:v2.37.9",
+      "user": "655:655",
       "cpu": 512,
       "memory": 512,
       "memoryReservation": 256,
@@ -43,13 +44,25 @@
           "protocol": "tcp"
         }
       ],
-      "essential": true,
+      "command": [
+        "--config.file=/tmp/prometheus.yml",
+        "--storage.tsdb.path=/mnt/efs/data",
+        "--web.console.libraries=/mnt/efs/config/console_libraries",
+        "--web.console.templates=/mnt/efs/config/consoles",
+        "--storage.tsdb.retention.time=200h",
+        "--web.enable-lifecycle"
+      ],
       "mountPoints": [
         {
-          "sourceVolume": "prometheus_config",
-          "containerPath": "/etc/prometheus"
+          "sourceVolume": "temp_volume",
+          "containerPath": "/tmp"
+        },
+        {
+          "sourceVolume": "efs_mount",
+          "containerPath": "/mnt/efs"
         }
       ],
+      "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -67,7 +80,8 @@
     },
     {
       "name": "grafana",
-      "image": "grafana/grafana",
+      "image": "grafana/grafana-oss:latest",
+      "user": "655:655",
       "cpu": 256,
       "memory": 256,
       "memoryReservation": 128,
@@ -76,6 +90,25 @@
           "containerPort": 3000,
           "hostPort": 3000,
           "protocol": "tcp"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "efs_mount",
+          "containerPath": "/mnt/efs"
+        },
+        {
+          "sourceVolume": "grafana_data",
+          "containerPath": "/var/lib/grafana"
+        },
+        {
+          "sourceVolume": "grafana_provisioning",
+          "containerPath": "/etc/grafana/provisioning"
+        },
+        {
+          "sourceVolume": "grafana_ini",
+          "containerPath": "/etc/grafana/grafana.ini",
+          "readOnly": true
         }
       ],
       "essential": true,
@@ -91,14 +124,54 @@
   ],
   "volumes": [
     {
-      "name": "prometheus_config",
-      "dockerVolumeConfiguration": {
-        "scope": "task",
-        "driver": "local"
+      "name": "temp_volume",
+      "host": {}
+    },
+    {
+      "name": "efs_mount",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0b382f88beed3111c",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "fsap-0a69146f01c4ecd6c",
+          "iam": "ENABLED"
+        }
+      }
+    },
+    {
+      "name": "grafana_data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0b382f88beed3111c",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "fsap-0a69146f01c4ecd6c",
+          "iam": "ENABLED"
+        }
+      }
+    },
+    {
+      "name": "grafana_provisioning",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0b382f88beed3111c",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "fsap-0a69146f01c4ecd6c",
+          "iam": "ENABLED"
+        }
+      }
+    },
+    {
+      "name": "grafana_ini",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0b382f88beed3111c",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "fsap-0a69146f01c4ecd6c",
+          "iam": "ENABLED"
+        }
       }
     }
   ],
-
   "requiresCompatibilities": ["EC2"],
   "cpu": "832",
   "memory": "512"
