@@ -27,14 +27,15 @@
     },
     {
       "name": "cadvisor-exporter",
-      "image": "google/cadvisor",
+      "image": "gcr.io/cadvisor/cadvisor:latest",
       "cpu": 512,
       "memory": 256,
       "memoryReservation": 128,
+      "command": ["-port=8098", "-logtostderr", "-v=2"],
       "portMappings": [
         {
-          "containerPort": 8080,
-          "hostPort": 9200,
+          "containerPort": 8098,
+          "hostPort": 8098,
           "protocol": "tcp"
         }
       ],
@@ -54,13 +55,13 @@
           "readOnly": true
         },
         {
-          "sourceVolume": "cgroup",
-          "containerPath": "/cgroup",
+          "sourceVolume": "var_run",
+          "containerPath": "/var/run",
           "readOnly": true
         },
         {
-          "sourceVolume": "var_run",
-          "containerPath": "/var/run",
+          "sourceVolume": "sys",
+          "containerPath": "/sys",
           "readOnly": true
         },
         {
@@ -75,7 +76,7 @@
         },
         {
           "sourceVolume": "cgroup",
-          "containerPath": "/sys/fs/cgroup",
+          "containerPath": "/cgroup",
           "readOnly": true
         }
       ],

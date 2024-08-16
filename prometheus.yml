@@ -16,7 +16,7 @@ scrape_configs:
           - ECS
   - job_name: ecs_CAdvisor
     ec2_sd_configs:
-      - port: 9200 # referred to cAdvisor exposed port
+      - port: 8098 # referred to cAdvisor exposed port
         role_arn: aarn:aws:iam::247988977671:role/ecsTaskExecutionRole
         filters:
         - name: tag:aws:autoscaling:groupName
