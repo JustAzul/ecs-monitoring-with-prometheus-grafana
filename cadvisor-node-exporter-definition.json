@@ -1,128 +1,129 @@
 {
-  "family": "cadvisor-node-exporter-definition",
-  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
-  "containerDefinitions": [
-    {
-      "name": "node-exporter",
-      "image": "prom/node-exporter",
-      "cpu": 512,
-      "memory": 256,
-      "memoryReservation": 128,
-      "portMappings": [
-        {
-          "containerPort": 9100,
-          "hostPort": 9100,
-          "protocol": "tcp"
-        }
-      ],
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/cadvisor-node-exporter",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs"
-        }
-      }
-    },
-    {
-      "name": "cadvisor-exporter",
-      "image": "gcr.io/cadvisor/cadvisor:latest",
-      "cpu": 512,
-      "memory": 256,
-      "memoryReservation": 128,
-      "command": ["-port=8098", "-logtostderr", "-v=2"],
-      "portMappings": [
-        {
-          "containerPort": 8098,
-          "hostPort": 8098,
-          "protocol": "tcp"
-        }
-      ],
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/cadvisor-node-exporter",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs"
+    "family": "cadvisor-node-exporter-definition",
+    "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+      {
+        "name": "node-exporter",
+        "image": "prom/node-exporter",
+        "cpu": 128,
+        "memory": 128,
+        "memoryReservation": 64,
+        "portMappings": [
+          {
+            "containerPort": 9100,
+            "hostPort": 9100,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true,
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/cadvisor-node-exporter",
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "ecs"
+          }
         }
       },
-      "mountPoints": [
-        {
-          "sourceVolume": "root",
-          "containerPath": "/rootfs",
-          "readOnly": true
+      {
+        "name": "cadvisor-exporter",
+        "image": "gcr.io/cadvisor/cadvisor:latest",
+        "cpu": 256,
+        "memory": 256,
+        "memoryReservation": 128,
+        "command": ["-port=8098", "-logtostderr", "-v=2"],
+        "portMappings": [
+          {
+            "containerPort": 8098,
+            "hostPort": 8098,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true,
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/cadvisor-node-exporter",
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "ecs"
+          }
         },
-        {
-          "sourceVolume": "var_run",
-          "containerPath": "/var/run",
-          "readOnly": true
-        },
-        {
-          "sourceVolume": "sys",
-          "containerPath": "/sys",
-          "readOnly": true
-        },
-        {
-          "sourceVolume": "var_lib_docker",
-          "containerPath": "/var/lib/docker",
-          "readOnly": true
-        },
-        {
-          "sourceVolume": "dev_disk",
-          "containerPath": "/dev/disk",
-          "readOnly": true
-        },
-        {
-          "sourceVolume": "cgroup",
-          "containerPath": "/cgroup",
-          "readOnly": true
+        "mountPoints": [
+          {
+            "sourceVolume": "root",
+            "containerPath": "/rootfs",
+            "readOnly": true
+          },
+          {
+            "sourceVolume": "var_run",
+            "containerPath": "/var/run",
+            "readOnly": true
+          },
+          {
+            "sourceVolume": "sys",
+            "containerPath": "/sys",
+            "readOnly": true
+          },
+          {
+            "sourceVolume": "var_lib_docker",
+            "containerPath": "/var/lib/docker",
+            "readOnly": true
+          },
+          {
+            "sourceVolume": "dev_disk",
+            "containerPath": "/dev/disk",
+            "readOnly": true
+          },
+          {
+            "sourceVolume": "cgroup",
+            "containerPath": "/cgroup",
+            "readOnly": true
+          }
+        ],
+        "privileged": true,
+        "readonlyRootFilesystem": false
+      }
+    ],
+    "volumes": [
+      {
+        "name": "root",
+        "host": {
+          "sourcePath": "/"
         }
-      ],
-      "privileged": true,
-      "readonlyRootFilesystem": false
-    }
-  ],
-  "volumes": [
-    {
-      "name": "root",
-      "host": {
-        "sourcePath": "/"
+      },
+      {
+        "name": "var_run",
+        "host": {
+          "sourcePath": "/var/run"
+        }
+      },
+      {
+        "name": "sys",
+        "host": {
+          "sourcePath": "/sys"
+        }
+      },
+      {
+        "name": "var_lib_docker",
+        "host": {
+          "sourcePath": "/var/lib/docker"
+        }
+      },
+      {
+        "name": "dev_disk",
+        "host": {
+          "sourcePath": "/dev/disk"
+        }
+      },
+      {
+        "name": "cgroup",
+        "host": {
+          "sourcePath": "/cgroup"
+        }
       }
-    },
-    {
-      "name": "var_run",
-      "host": {
-        "sourcePath": "/var/run"
-      }
-    },
-    {
-      "name": "sys",
-      "host": {
-        "sourcePath": "/sys"
-      }
-    },
-    {
-      "name": "var_lib_docker",
-      "host": {
-        "sourcePath": "/var/lib/docker"
-      }
-    },
-    {
-      "name": "dev_disk",
-      "host": {
-        "sourcePath": "/dev/disk"
-      }
-    },
-    {
-      "name": "cgroup",
-      "host": {
-        "sourcePath": "/cgroup"
-      }
-    }
-  ],
-  "requiresCompatibilities": ["EC2"],
-  "cpu": "1024",
-  "memory": "512"
-}
+    ],
+    "requiresCompatibilities": ["EC2"],
+    "cpu": "384",
+    "memory": "384"
+  }
+  

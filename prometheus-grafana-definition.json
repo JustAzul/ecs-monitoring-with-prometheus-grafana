@@ -5,9 +5,9 @@
     {
       "name": "init-container",
       "image": "alpine:latest",
-      "cpu": 0,
-      "memory": 256,
-      "memoryReservation": 128,
+      "cpu": 64,
+      "memory": 128,
+      "memoryReservation": 64,
       "essential": false,
       "command": [
         "wget",
@@ -68,8 +68,8 @@
     {
       "name": "grafana",
       "image": "grafana/grafana",
-      "cpu": 512,
-      "memory": 512,
+      "cpu": 256,
+      "memory": 256,
       "memoryReservation": 128,
       "portMappings": [
         {
@@ -100,6 +100,6 @@
   ],
 
   "requiresCompatibilities": ["EC2"],
-  "cpu": "1024",
+  "cpu": "832",
   "memory": "512"
 }
