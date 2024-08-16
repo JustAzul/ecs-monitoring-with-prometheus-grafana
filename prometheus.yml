@@ -19,7 +19,7 @@ scrape_configs:
       - port: 9200 # referred to cAdvisor exposed port
         role_arn: aarn:aws:iam::247988977671:role/ecsTaskExecutionRole
         filters:
-        - name: tag:AutoScalingGroupName
+        - name: tag:aws:autoscaling:groupName
           values:
           - ECS
 
