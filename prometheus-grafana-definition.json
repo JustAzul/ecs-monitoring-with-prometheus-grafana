@@ -47,8 +47,8 @@
       "command": [
         "--config.file=/tmp/prometheus.yml",
         "--storage.tsdb.path=/mnt/efs/data",
-        "--web.console.libraries=/mnt/efs/config/console_libraries",
-        "--web.console.templates=/mnt/efs/config/consoles",
+        "--web.console.libraries=/.prometheus-config/console_libraries",
+        "--web.console.templates=/.prometheus-config/consoles",
         "--storage.tsdb.retention.time=200h",
         "--web.enable-lifecycle"
       ],
@@ -58,8 +58,11 @@
           "containerPath": "/tmp"
         },
         {
-          "sourceVolume": "efs_mount",
-          "containerPath": "/mnt/efs"
+          "sourceVolume": "prometheus_data",
+          "containerPath": "/prometheus"
+        },{
+          "sourceVolume": "prometheus_config",
+          "containerPath": "/.prometheus-config"
         }
       ],
       "essential": true,
@@ -94,10 +97,6 @@
       ],
       "mountPoints": [
         {
-          "sourceVolume": "efs_mount",
-          "containerPath": "/mnt/efs"
-        },
-        {
           "sourceVolume": "grafana_data",
           "containerPath": "/var/lib/grafana"
         },
@@ -128,48 +127,39 @@
       "host": {}
     },
     {
-      "name": "efs_mount",
+      "name": "prometheus_data",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-0a69146f01c4ecd6c",
-          "iam": "ENABLED"
-        }
-      }
+        "rootDirectory": "/data"      }
+    },
+    {
+      "name": "prometheus_config",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0b382f88beed3111c",
+        "transitEncryption": "ENABLED",
+        "rootDirectory": "/config"      }
     },
     {
       "name": "grafana_data",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-0a69146f01c4ecd6c",
-          "iam": "ENABLED"
-        }
-      }
+        "rootDirectory": "/grafana"      }
     },
     {
       "name": "grafana_provisioning",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-0a69146f01c4ecd6c",
-          "iam": "ENABLED"
-        }
-      }
+        "rootDirectory": "/grafana/provisioning"      }
     },
     {
       "name": "grafana_ini",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
         "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-0a69146f01c4ecd6c",
-          "iam": "ENABLED"
-        }
-      }
+        "rootDirectory": "/grafana/config/grafana.ini"      }
     }
   ],
   "requiresCompatibilities": ["EC2"],
