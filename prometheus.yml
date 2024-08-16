@@ -1,25 +1,40 @@
 global:
-  scrape_interval: 5s
-  external_labels:
-    monitor: 'devopsage-monitor'
+  scrape_interval: 5s  # Adjust to your preferred setting
+
+external_labels:
+  monitor: 'devopsage-monitor'
+
 scrape_configs:
   - job_name: 'prometheus'
+    scrape_interval: 5s
     static_configs:
-    - targets: ['localhost:9090'] ## IP Address of the localhost
+      - targets: ['localhost:9090']  # Local Prometheus
+
+  - job_name: "myapi"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["myapi:6003"]
+    metrics_path: "/tam-metrics"
+
   - job_name: 'ec2_aws_node_exporter_discovery'
     ec2_sd_configs:
-      - port: 9100 # referred to nodeExporter exposed port
+      - port: 9100  # referred to nodeExporter exposed port
         role_arn: arn:aws:iam::247988977671:role/ecsTaskExecutionRole
         filters:
         - name: tag:aws:autoscaling:groupName
           values:
           - ECS
-  - job_name: ecs_CAdvisor
+
+  - job_name: 'ecs_CAdvisor'
     ec2_sd_configs:
-      - port: 8098 # referred to cAdvisor exposed port
-        role_arn: aarn:aws:iam::247988977671:role/ecsTaskExecutionRole
+      - port: 8098  # referred to cAdvisor exposed port
+        role_arn: arn:aws:iam::247988977671:role/ecsTaskExecutionRole
         filters:
         - name: tag:aws:autoscaling:groupName
           values:
           - ECS
 
+  - job_name: 'nginx'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['172.31.43.244:9113']
