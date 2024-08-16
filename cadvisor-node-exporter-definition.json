@@ -92,15 +92,15 @@
       }
     },
     {
-      "name": "cgroup",
-      "host": {
-        "sourcePath": "/cgroup"
-      }
-    },
-    {
       "name": "var_run",
       "host": {
         "sourcePath": "/var/run"
+      }
+    },
+    {
+      "name": "sys",
+      "host": {
+        "sourcePath": "/sys"
       }
     },
     {
@@ -113,6 +113,12 @@
       "name": "dev_disk",
       "host": {
         "sourcePath": "/dev/disk"
+      }
+    },
+    {
+      "name": "cgroup",
+      "host": {
+        "sourcePath": "/cgroup"
       }
     }
   ],
