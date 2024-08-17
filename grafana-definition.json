@@ -63,5 +63,5 @@
   ],
   "requiresCompatibilities": ["EC2"],
   "cpu": "256",
-  "memory": "192"
+  "memory": "256"
 }
