@@ -14,20 +14,20 @@ Setup ECS monitoring using Prometheus, Grafana, cAdvisor and Node Exporter
 1. Create Task Definitions for cAdvisor, Node-Exporter, Prometheus and Grafana:
 
 ```
-aws ecs register-task-definition --cli-input-json file://./cadvisor-node-exporter-definition.json --region us-east-2
-aws ecs register-task-definition --cli-input-json file://./prometheus-grafana-definition.json --region us-east-2
+aws ecs register-task-definition --cli-input-json file://./cadvisor-node-exporter-definition.json
+aws ecs register-task-definition --cli-input-json file://./prometheus-grafana-definition.json
 ```
   
 2. Create a DAEMON Service to run cAdvisor, Node-Exporter on every node in ECS Cluster:
 
 ```
-aws ecs create-service --cluster MyWorkingCluster --service-name cadvisor-node-exporter --task-definition cadvisor-node-exporter-definition:1 --launch-type EC2 --scheduling-strategy DAEMON --region us-east-2
+aws ecs create-service --cluster production-cluster --service-name cadvisor-node-exporter --task-definition cadvisor-node-exporter-definition:14 --launch-type EC2 --scheduling-strategy DAEMON
 ```
 
 3. Run one ECS Task for Prometheus and Grafana in the clsuter:
 
 ```
-aws ecs run-task --cluster MyWorkingCluster --task-definition prometheus-grafana-definition:1  --region us-east-2
+aws ecs run-task --cluster production-cluster --task-definition prometheus-grafana-definition:11
 ```
 
 4. Access Grafana Dashboard using URL: http://monitor_ec2_public_ip:3000
