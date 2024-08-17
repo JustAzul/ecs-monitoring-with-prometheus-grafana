@@ -1,0 +1,34 @@
+{
+    "serviceName": "grafana-service",
+    "taskDefinition": "grafana-definition",
+    "cluster": "on-demand-cluster-1gb",
+    "desiredCount": 1,
+    "capacityProviderStrategy": [
+        {
+            "capacityProvider": "t4g-on-demand",
+            "weight": 1,
+            "base": 1
+        }
+    ],
+    "deploymentConfiguration": {
+        "deploymentCircuitBreaker": {
+            "enable": false,
+            "rollback": false
+        },
+        "maximumPercent": 200,
+        "minimumHealthyPercent": 100
+    },
+    "placementStrategy": [
+        {
+            "type": "binpack",
+            "field": "MEMORY"
+        }
+    ],
+    "schedulingStrategy": "REPLICA",
+    "deploymentController": {
+        "type": "ECS"
+    },
+    "enableECSManagedTags": false,
+    "propagateTags": "NONE",
+    "enableExecuteCommand": false
+}
