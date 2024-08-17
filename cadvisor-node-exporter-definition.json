@@ -5,7 +5,6 @@
     {
       "name": "node-exporter",
       "image": "prom/node-exporter",
-      "cpu": 64,
       "memory": 64,
       "memoryReservation": 32,
       "portMappings": [
@@ -28,7 +27,6 @@
     {
       "name": "cadvisor-exporter",
       "image": "gcr.io/cadvisor/cadvisor:latest",
-      "cpu": 128,
       "memory": 128,
       "memoryReservation": 64,
       "command": ["-port=8098", "-logtostderr", "-v=2"],
@@ -123,6 +121,5 @@
     }
   ],
   "requiresCompatibilities": ["EC2"],
-  "cpu": "192",
   "memory": "144"
 }
