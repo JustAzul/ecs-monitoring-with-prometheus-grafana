@@ -1,7 +1,7 @@
 {
     "serviceName": "grafana-service",
     "taskDefinition": "grafana-definition",
-    "cluster": "on-demand-cluster-1gb",
+    "cluster": "production-cluster",
     "desiredCount": 1,
     "capacityProviderStrategy": [
         {
