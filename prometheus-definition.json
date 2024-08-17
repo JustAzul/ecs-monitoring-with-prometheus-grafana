@@ -1,5 +1,5 @@
 {
-  "family": "prometheus-grafana-definition",
+  "family": "prometheus-definition",
   "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
@@ -43,40 +43,6 @@
           "awslogs-stream-prefix": "ecs"
         }
       }
-    },
-    {
-      "name": "grafana",
-      "image": "grafana/grafana-oss:latest",
-      "user": "656:656",
-      "cpu": 256,
-      "memory": 256,
-      "memoryReservation": 128,
-      "portMappings": [
-        {
-          "containerPort": 3000,
-          "hostPort": 3000,
-          "protocol": "tcp"
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "grafana_data",
-          "containerPath": "/var/lib/grafana"
-        },
-        {
-          "sourceVolume": "grafana_config",
-          "containerPath": "/etc/grafana"
-        }
-      ],
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/grafana",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs"
-        }
-      }
     }
   ],
   "volumes": [
@@ -101,31 +67,9 @@
           "iam": "ENABLED"
         }
       }
-    },
-    {
-      "name": "grafana_data",
-      "efsVolumeConfiguration": {
-        "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-0944fc9e03a4b8e53",
-          "iam": "ENABLED"
-        }
-      }
-    },
-    {
-      "name": "grafana_config",
-      "efsVolumeConfiguration": {
-        "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-00bd5e71fa95244ca",
-          "iam": "ENABLED"
-        }
-      }
     }
   ],
   "requiresCompatibilities": ["EC2"],
-  "cpu": "768",
-  "memory": "576"
+  "cpu": "512",
+  "memory": "512"
 }
