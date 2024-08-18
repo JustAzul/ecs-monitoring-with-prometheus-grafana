@@ -1,51 +1,53 @@
 {
   "family": "cadvisor-node-exporter-definition",
-  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "node-exporter",
       "image": "prom/node-exporter",
-      "memory": 64,
+      "cpu": 0,
+      "memory": 65,
       "memoryReservation": 32,
       "portMappings": [
         {
+          "name": "node-exporter-9100-tcp",
           "containerPort": 9100,
           "hostPort": 9100,
           "protocol": "tcp"
         }
       ],
       "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "readonlyRootFilesystem": true,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/cadvisor-node-exporter",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
-        }
-      }
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
     },
     {
       "name": "cadvisor-exporter",
       "image": "gcr.io/cadvisor/cadvisor:latest",
+      "cpu": 0,
       "memory": 128,
-      "memoryReservation": 64,
-      "command": ["-port=8098", "-logtostderr", "-v=2"],
+      "memoryReservation": 65,
       "portMappings": [
         {
+          "name": "cadvisor-exporter-8098-tcp",
           "containerPort": 8098,
           "hostPort": 8098,
           "protocol": "tcp"
         }
       ],
       "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/cadvisor-node-exporter",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
+      "command": ["-port=8098", "-logtostderr", "-v=2"],
+      "environment": [],
       "mountPoints": [
         {
           "sourceVolume": "root",
@@ -78,10 +80,24 @@
           "readOnly": true
         }
       ],
+      "volumesFrom": [],
       "privileged": true,
-      "readonlyRootFilesystem": false
+      "readonlyRootFilesystem": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cadvisor-node-exporter",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
     }
   ],
+  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+  "networkMode": "host",
   "volumes": [
     {
       "name": "root",
@@ -121,5 +137,9 @@
     }
   ],
   "requiresCompatibilities": ["EC2"],
-  "memory": "144"
+  "memory": "144",
+  "runtimePlatform": {
+    "cpuArchitecture": "ARM64",
+    "operatingSystemFamily": "LINUX"
+  }
 }

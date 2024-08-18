@@ -1,21 +1,22 @@
 {
   "family": "grafana-definition",
-  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "grafana",
       "image": "grafana/grafana-oss:latest",
-      "user": "656:656",
       "cpu": 256,
       "memory": 256,
       "memoryReservation": 128,
       "portMappings": [
         {
+          "name": "grafana-3000-tcp",
           "containerPort": 3000,
           "hostPort": 3000,
           "protocol": "tcp"
         }
       ],
+      "essential": true,
+      "environment": [],
       "mountPoints": [
         {
           "sourceVolume": "grafana_data",
@@ -26,7 +27,8 @@
           "containerPath": "/etc/grafana"
         }
       ],
-      "essential": true,
+      "volumesFrom": [],
+      "user": "656:656",
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -34,34 +36,36 @@
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
         }
-      }
+      },
+      "systemControls": []
     }
   ],
+  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+  "networkMode": "bridge",
   "volumes": [
     {
       "name": "grafana_data",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-0944fc9e03a4b8e53",
-          "iam": "ENABLED"
-        }
+        "rootDirectory": "/prometheus-stack/grafana",
+        "transitEncryption": "ENABLED"
       }
     },
     {
       "name": "grafana_config",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-00bd5e71fa95244ca",
-          "iam": "ENABLED"
-        }
+        "rootDirectory": "/prometheus-stack/grafana/config",
+        "transitEncryption": "ENABLED"
       }
     }
   ],
   "requiresCompatibilities": ["EC2"],
   "cpu": "256",
-  "memory": "256"
+  "memory": "256",
+  "runtimePlatform": {
+    "cpuArchitecture": "ARM64",
+    "operatingSystemFamily": "LINUX"
+  }
 }

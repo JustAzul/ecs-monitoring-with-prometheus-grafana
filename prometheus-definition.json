@@ -1,21 +1,21 @@
 {
   "family": "prometheus-definition",
-  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "prometheus",
       "image": "prom/prometheus:v2.37.9",
-      "user": "655:655",
       "cpu": 512,
       "memory": 512,
       "memoryReservation": 256,
       "portMappings": [
         {
+          "name": "prometheus-tcp-9090",
           "containerPort": 9090,
           "hostPort": 9090,
           "protocol": "tcp"
         }
       ],
+      "essential": true,
       "command": [
         "--config.file=/.prometheus-config/prometheus.yml",
         "--storage.tsdb.path=/.prometheus-data",
@@ -24,48 +24,50 @@
         "--storage.tsdb.retention.time=200h",
         "--web.enable-lifecycle"
       ],
+      "environment": [],
       "mountPoints": [
         {
           "sourceVolume": "prometheus_data",
-          "containerPath": "/.prometheus-data"
+          "containerPath": "/.prometheus-data/"
         },
         {
           "sourceVolume": "prometheus_config",
-          "containerPath": "/.prometheus-config"
+          "containerPath": "/.prometheus-config/"
         }
       ],
-      "essential": true,
+      "volumesFrom": [],
+      "user": "655:655",
+      "readonlyRootFilesystem": false,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/prometheus",
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
-        }
-      }
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
     }
   ],
+  "taskRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::247988977671:role/ecsTaskExecutionRole",
+  "networkMode": "bridge",
   "volumes": [
     {
       "name": "prometheus_data",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-05ccf1a675b937bb2",
-          "iam": "ENABLED"
-        }
+        "rootDirectory": "/prometheus-stack/data",
+        "transitEncryption": "ENABLED"
       }
     },
     {
       "name": "prometheus_config",
       "efsVolumeConfiguration": {
         "fileSystemId": "fs-0b382f88beed3111c",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "fsap-08fd12728c2dfc58b",
-          "iam": "ENABLED"
-        }
+        "rootDirectory": "/prometheus-stack/config",
+        "transitEncryption": "ENABLED"
       }
     }
   ],
